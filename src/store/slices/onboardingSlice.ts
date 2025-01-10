@@ -12,29 +12,50 @@ import type { LanguageCode } from '@/constants/languages'
 import { BaseAssessmentRequest, ComprehensionAssessmentRequest, GrammarAssessmentRequest, PronunciationAssessmentRequest, VocabularyAssessmentRequest } from '@/lib/models/requests/assessments/AssessmentRequests'
 import { onboardingStorage } from '@/lib/services/onboardingStorage'
 
-// Async Thunks
-export const startAssessment = createAsyncThunk(
+
+// Create thunks with error handling
+const createThunkWithError = <ReturnType, ArgType>(
+  typePrefix: string,
+  payloadCreator: (arg: ArgType) => Promise<ReturnType>
+) => {
+  return createAsyncThunk<ReturnType, ArgType>(
+    typePrefix,
+    async (arg, { rejectWithValue }) => {
+      try {
+        return await payloadCreator(arg)
+      } catch (error) {
+        console.error('Error in thunk:', error)
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+
+        return rejectWithValue(errorMessage)
+      }
+    }
+  )
+}
+
+// Async Thunks with error handling
+export const startAssessment = createThunkWithError(
   'onboarding/startAssessment',
   async (firstType: AssessmentType) => {
     return await onboardingService.startAssessment(firstType)
   }
 )
 
-export const submitLanguagePreferences = createAsyncThunk(
+export const submitLanguagePreferences = createThunkWithError(
   'onboarding/submitLanguagePreferences',
   async (preferences: { nativeLanguage: LanguageCode; targetLanguage: LanguageCode }) => {
     return await onboardingService.submitLanguagePreferences(preferences)
   }
 )
 
-export const getPrompt = createAsyncThunk(
+export const getPrompt = createThunkWithError(
   'onboarding/getPrompt',
   async (type: AssessmentType) => {
     return await onboardingService.getPrompt(type)
   }
 )
 
-export const submitAssessment = createAsyncThunk(
+export const submitAssessment = createThunkWithError(
   'onboarding/submitAssessment',
   async ({ type, data }: { type: AssessmentType; data: BaseAssessmentRequest }) => {
     switch (type) {
@@ -120,14 +141,25 @@ const onboardingSlice = createSlice({
         state.loading = false
         state.prompts[state.assessmentType!] = action.payload
         state.sessionLoaded = true
+        state.error = null
       })
       .addCase(startAssessment.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || 'Failed to start assessment'
+        state.error = action.payload as string || 'Failed to start assessment'
       })
       // Submit Language Preferences
+      .addCase(submitLanguagePreferences.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(submitLanguagePreferences.fulfilled, (state) => {
+        state.loading = false
         state.currentStep = OnboardingStep.AssessmentIntro
+        state.error = null
+      })
+      .addCase(submitLanguagePreferences.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string || 'Failed to submit language preferences'
       })
       // Get Prompt
       .addCase(getPrompt.fulfilled, (state, action) => {

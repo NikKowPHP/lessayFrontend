@@ -17,7 +17,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
   return (
     <ErrorContext.Provider value={{ error, setError, clearError }}>
       {error && (
-        <div className="fixed top-16 left-0 right-0 z-50 flex justify-center">
+        <div className="fixed top-20 left-0 right-0 z-50 flex justify-center">
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md shadow-lg flex items-center justify-between max-w-md w-full mx-4">
             <span>{error}</span>
             <button

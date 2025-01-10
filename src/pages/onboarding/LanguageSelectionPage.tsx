@@ -4,11 +4,12 @@ import { submitLanguagePreferences } from '@/store/slices/onboardingSlice'
 import { ROUTES } from '@/lib/constants/routes'
 import type { LanguageCode } from '@/constants/languages'
 import LanguageSelector from '@/components/onboarding/LanguageSelector'
+import { useError } from '@/lib/providers/ErrorProvider'
 
 export default function LanguageSelectionPage() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-
+  const { setError } = useError()
   const handleSubmit = async (nativeLanguage: LanguageCode, targetLanguage: LanguageCode) => {
     try {
       await dispatch(submitLanguagePreferences({
@@ -17,7 +18,9 @@ export default function LanguageSelectionPage() {
       })).unwrap()
       navigate(ROUTES.ONBOARDING.ASSESSMENT.QUESTION)
     } catch (error) {
-      console.error('Failed to submit language preferences:', error)
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+      console.error('Failed to submit language preferences:', errorMessage)
+      setError(errorMessage)
     }
   }
 
