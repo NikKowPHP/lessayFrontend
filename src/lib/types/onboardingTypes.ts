@@ -4,11 +4,14 @@ import { VocabularyResponse } from "../models/responses/assessments/VocabularyRe
 import { GrammarResponse } from "../models/responses/assessments/GrammarResponse"
 import { ComprehensionResponse } from "../models/responses/assessments/ComprehensionResponse"
 import { FinalAssessmentResponse } from "../models/responses/assessments/FinalAssessmentResponse"
+import { LanguageCode } from "../constants/languages"
+import { LanguagePreferencesResponse } from "../models/languages/LanguagePreferencesModel"
 
 export interface OnboardingSession {
   assessmentId: string | null
   currentStep: OnboardingStep
   assessmentType: AssessmentType | null
+  languages: LanguagePreferencesResponse | null
   assessmentProgress: number
   prompts: AssessmentPrompts
   responses: AssessmentResponses
@@ -54,13 +57,14 @@ export interface AssessmentResponses {
 export interface OnboardingState {
   isComplete: boolean
   currentStep: OnboardingStep
+  languages: LanguagePreferencesResponse | null
   assessmentType: AssessmentType | null
   loading: boolean
   error: string | null
   assessmentProgress: number
   assessmentId: string | null
-  prompts: Record<AssessmentType, any>
-  responses: Record<AssessmentType, any>
+  prompts: AssessmentPrompts
+  responses: AssessmentResponses
   promptsLoaded: boolean
   sessionLoaded: boolean
   finalAssessment: FinalAssessmentResponse | null
@@ -111,4 +115,10 @@ export const OnboardingStepConfigs: Record<OnboardingStep, OnboardingStepConfig>
     nextStep: null,
     prevStep: OnboardingStep.Assessment
   }
+}
+// Define return type for the thunk
+export interface OnboardingFlowResult {
+  isComplete: boolean;
+  currentStep?: OnboardingStep;
+  languages?: LanguagePreferencesResponse | null;
 }

@@ -101,6 +101,7 @@ class OnboardingService {
         assessmentProgress: 0,
         prompts: {},
         responses: {},
+        languages: null,
         promptLoadStatus: await this.getPromptLoadStatus()
       }
       
@@ -247,35 +248,62 @@ class OnboardingService {
   }
 
   async checkAndRedirectOnboarding(): Promise<void> {
-    const isComplete = await this.isOnboardingComplete()
-    
-    if (!isComplete) {
-      // Get current pathname
-      const currentPath = window.location.pathname
+    try {
+      const isComplete = await this.isOnboardingComplete()
       
-      // Check if already on onboarding route
-      const isOnboardingRoute = currentPath.startsWith(ROUTES.ONBOARDING.ROOT)
-      
-      if (!isOnboardingRoute) {
-        // Redirect to last known onboarding step or start
-        const session = await storageService.getOnboardingSession()
-        const redirectPath = session 
-          ? this.getOnboardingRedirectPath(session.currentStep)
-          : ROUTES.ONBOARDING.LANGUAGE
+      if (!isComplete) {
+        const currentPath = window.location.pathname
+        const isOnboardingRoute = currentPath.startsWith(ROUTES.ONBOARDING.ROOT)
         
-        window.location.href = redirectPath
+        if (!isOnboardingRoute) {
+          // Get stored languages first
+          const storedLanguages = await this.getStoredLanguages()
+          const session = await storageService.getOnboardingSession()
+          
+          let redirectPath:string = ROUTES.ONBOARDING.LANGUAGE
+
+          if (session) {
+            // If we have a session, determine the correct step based on progress
+            if (storedLanguages && session.currentStep <= OnboardingStep.Language) {
+              redirectPath = ROUTES.ONBOARDING.ASSESSMENT.INTRO
+            } else {
+              redirectPath = await this.getOnboardingRedirectPath(session.currentStep)
+            }
+          } else if (storedLanguages) {
+            // If we only have stored languages but no session
+            redirectPath = ROUTES.ONBOARDING.ASSESSMENT.INTRO
+          }
+          
+          window.location.href = redirectPath
+        }
       }
+    } catch (error) {
+      console.error('Failed to check and redirect onboarding:', error)
+      // Fallback to language selection on error
+      window.location.href = ROUTES.ONBOARDING.LANGUAGE
     }
   }
 
-  private getOnboardingRedirectPath(step: OnboardingStep): string {
+  private async getOnboardingRedirectPath(step: OnboardingStep): Promise<string> {
+    // Add validation to ensure we don't skip steps
+    const storedLanguages = await this.getStoredLanguages()
+    
+    if (!storedLanguages) {
+      return ROUTES.ONBOARDING.LANGUAGE
+    }
+
     switch (step) {
       case OnboardingStep.Language:
         return ROUTES.ONBOARDING.LANGUAGE
       case OnboardingStep.AssessmentIntro:
         return ROUTES.ONBOARDING.ASSESSMENT.INTRO
       case OnboardingStep.Assessment:
-        return ROUTES.ONBOARDING.ASSESSMENT.QUESTION
+        // Check if we have any prompts loaded before allowing assessment
+        const session = await storageService.getOnboardingSession()
+        if (session?.prompts && Object.keys(session.prompts).length > 0) {
+          return ROUTES.ONBOARDING.ASSESSMENT.QUESTION
+        }
+        return ROUTES.ONBOARDING.ASSESSMENT.INTRO
       case OnboardingStep.Complete:
         return ROUTES.ONBOARDING.ASSESSMENT.COMPLETE
       default:

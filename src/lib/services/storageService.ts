@@ -23,6 +23,7 @@ class StorageService {
     try {
       // Try session storage first for quick access
       const sessionData = sessionStorage.getItem('onboarding_session')
+      console.log('sessionData', sessionData)
       if (sessionData) {
         return JSON.parse(sessionData)
       }

@@ -4,17 +4,8 @@ import type {
   IOnboardingApi,
 } from '../interfaces/IOnboardingApi'
 import { LanguagePreferenceRequest, LanguagePreferencesResponse } from '@/lib/models/languages/LanguagePreferencesModel'
+import { onboardingStorage } from '@/lib/services/onboardingStorage'
 
-// Configure localforage instance for onboarding data
-const onboardingStorage = localforage.createInstance({
-  name: 'lessay',
-  storeName: 'onboarding',
-})
-
-const STORAGE_KEYS = {
-  LANGUAGES: 'language_preferences',
-  ASSESSMENT: 'assessment_progress',
-} as const
 
 
 
@@ -481,16 +472,14 @@ export class MockOnboardingApi implements IOnboardingApi {
   async submitLanguages(data: LanguagePreferenceRequest) {
     const response = await this.handleMockRequest('/languages', 'POST', data)
 
-    await onboardingStorage.setItem(STORAGE_KEYS.LANGUAGES, response)
 
     return { data: response }
   }
+  // todo: return just mockvalues 
 
   async getStoredLanguages() {
     try {
-      return await onboardingStorage.getItem<LanguagePreferencesResponse>(
-        STORAGE_KEYS.LANGUAGES
-      )
+      const response = 
     } catch {
       return null
     }

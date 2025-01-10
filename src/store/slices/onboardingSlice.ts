@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { onboardingService } from '@/lib/services/onboardingService'
-import type { RootState } from '@/store'
+import type { AppDispatch, RootState } from '@/store'
 import { 
   AssessmentType, 
   OnboardingStep, 
   OnboardingState,
   AssessmentPrompts,
-  AssessmentResponses
+  AssessmentResponses,
+  OnboardingFlowResult
 } from '@/lib/types/onboardingTypes'
 import type { LanguageCode } from '@/constants/languages'
 import { BaseAssessmentRequest, ComprehensionAssessmentRequest, GrammarAssessmentRequest, PronunciationAssessmentRequest, VocabularyAssessmentRequest } from '@/lib/models/requests/assessments/AssessmentRequests'
 import { onboardingStorage } from '@/lib/services/onboardingStorage'
+import { LanguagePreferencesResponse } from '@/lib/models/languages/LanguagePreferencesModel'
 
 
 // Create thunks with error handling
@@ -107,9 +109,100 @@ export const preloadPrompts = createThunkWithError<Record<AssessmentType, boolea
   }
 )
 
+// Add new thunk for initializing onboarding state
+export const initializeOnboardingState = createThunkWithError(
+  'onboarding/initialize',
+  async () => {
+    // 1. Try getting from storage first
+    const session = await onboardingStorage.getSession()
+    if (session) {
+      return session
+    }
+
+    // 2. If no session, check for stored languages
+    const storedLanguages = await onboardingService.getStoredLanguages()
+    if (storedLanguages) {
+      return {
+        currentStep: OnboardingStep.AssessmentIntro,
+        languages: storedLanguages,
+        // ... other initial state
+      }
+    }
+
+    // 3. If nothing stored, return fresh state
+    return null
+  }
+)
+
+// Add new selector for loading state
+export const selectOnboardingLoading = (state: RootState) => 
+  state.onboarding.loading || !state.onboarding.sessionLoaded
+
+export const initializeOnboardingFlow = createAsyncThunk<
+  OnboardingFlowResult,
+  void,
+  {
+    dispatch: AppDispatch;
+    state: RootState;
+    rejectValue: string;
+  }
+>(
+  'onboarding/initializeFlow',
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      // 1. First check if onboarding is complete
+      const isComplete = await onboardingService.isOnboardingComplete()
+      
+      if (!isComplete) {
+        // 2. Try to restore existing session
+        const session = await onboardingStorage.getSession()
+        if (session) {
+          await dispatch(initializeOnboardingState(session)).unwrap()
+          return {
+            isComplete: false,
+            currentStep: session.currentStep,
+            languages: session.languages
+          }
+        }
+        
+        // 3. Get stored languages if no session
+        const storedLanguages = await onboardingService.getStoredLanguages()
+        if (storedLanguages) {
+          // Ensure we return the full LanguagePreferencesResponse structure
+          const languageResponse: LanguagePreferencesResponse = {
+            status: 'success',
+            data: {
+              nativeLanguage: storedLanguages.data.nativeLanguage,
+              targetLanguage: storedLanguages.data.targetLanguage,
+              timestamp: storedLanguages.data.timestamp,
+              preferences_id: storedLanguages.data.preferences_id
+            }
+          }
+          
+          return {
+            isComplete: false,
+            currentStep: OnboardingStep.AssessmentIntro,
+            languages: languageResponse
+          }
+        }
+      }
+      
+      // Return just completion status if no other data
+      return { 
+        isComplete 
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Failed to initialize onboarding flow'
+      )
+    }
+  }
+)
+
 const initialState: OnboardingState = {
   isComplete: false,
   currentStep: OnboardingStep.Language,
+  languages: [],
   assessmentType: null,
   loading: false,
   error: null,
@@ -208,13 +301,26 @@ const onboardingSlice = createSlice({
       .addCase(preloadPrompts.fulfilled, (state, action) => {
         state.promptLoadStatus = action.payload
       })
+   .addCase(initializeOnboardingState.fulfilled, (state, action) => {
+        if (action.payload) {
+          // Merge stored state with initial state
+          return {
+            ...initialState,
+            ...action.payload
+          }
+        }
+      })
       .addMatcher(
-        (action) => action.type.startsWith('onboarding/') && action.type.endsWith('/fulfilled'),
+        (action) => action.type.startsWith('onboarding/'),
         (state) => {
-          onboardingStorage.setSession(state)
+          // Only persist meaningful state changes
+          if (state.currentStep !== OnboardingStep.Language || state.languages) {
+            onboardingStorage.setSession(state)
+          }
           return state
         }
       )
+   
   }
 })
 
