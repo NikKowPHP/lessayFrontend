@@ -7,15 +7,30 @@ import { onboardingService } from '@/lib/services/onboardingService'
 
 export const fetchLearningPath = createAsyncThunk(
   'learning/fetchPath',
-  async (_, { dispatch }) => {
-    // Check onboarding status before fetching path
-    const isComplete = await onboardingService.isOnboardingComplete()
-    if (!isComplete) {
-      await onboardingService.checkAndRedirectOnboarding()
-      throw new Error('Onboarding not complete')
+  async (_, { rejectWithValue }) => {
+    try {
+      // First check if onboarding is complete
+      const isOnboardingComplete = await onboardingService.isOnboardingComplete()
+      if (!isOnboardingComplete) {
+        await onboardingService.checkAndRedirectOnboarding()
+        return rejectWithValue('Onboarding not complete')
+      }
+
+      // If onboarding is complete, fetch the learning path
+      const learningPath = await learningService.getLearningPath()
+      
+      // Find the current step index
+      const currentStepIndex = learningPath.steps.findIndex(
+        step => step.status === StepStatus.Current
+      )
+
+      return {
+        ...learningPath,
+        currentStepIndex: currentStepIndex !== -1 ? currentStepIndex : 0
+      }
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch learning path')
     }
-    
-    return await learningService.getLearningPath()
   }
 )
 
