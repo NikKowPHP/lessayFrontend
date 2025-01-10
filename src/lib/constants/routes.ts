@@ -1,7 +1,11 @@
 export const ROUTES = {
+  LANDING: {
+    PATH: '/',
+  },
   AUTH: {
-    LOGIN: '/auth/login',
-    SIGNUP: '/auth/signup',
+    // LOGIN: '/auth/login',
+    // SIGNUP: '/auth/signup',
+    ROOT: '/auth',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
   },
