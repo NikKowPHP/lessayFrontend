@@ -11,16 +11,22 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.1",
+    "axios": "^1.7.9",
     "js-cookie": "^3.0.5",
+    "path": "^0.12.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2",
     "react-redux": "^9.1.0",
-    "react-router-dom": "^7.1.1"
+    "react-router-dom": "^7.1.1",
+    "react-youtube": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/axios": "^0.14.4",
     "@types/js-cookie": "^3.0.6",
     "@types/localforage": "^0.0.34",
+    "@types/node": "^22.10.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
