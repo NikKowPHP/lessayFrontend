@@ -18,7 +18,7 @@ Consistency: Enforce a consistent coding style and project structure across the 
 
 2. Core Principles
 
-Senior-Level Code: All code must be written at a senior developer level, demonstrating a deep understanding of JavaScript/TypeScript, React, Next.js the latest version 13+, and web development best practices.
+Senior-Level Code: All code must be written at a senior developer level, demonstrating a deep understanding of JavaScript/TypeScript, React,  and web development best practices.
 
 Project flow: ui -> provider ->  service -> session storage <-> api service 
 
@@ -32,7 +32,7 @@ Continuous Learning: Developers are expected to stay up-to-date with the latest 
 
 Language: TypeScript
 
-Framework: Next.js (React)
+Framework: React
 
 Styling: Tailwind CSS
 
@@ -100,7 +100,7 @@ Avoid Magic Numbers and Strings:
 
 Define constants for all magic numbers and strings to improve code readability and maintainability.
 
-6. React and Next.js Best Practices
+6. React and Best Practices
 
 Functional Components: Use functional components and hooks exclusively. Avoid class components.
 
@@ -120,15 +120,12 @@ Props: Keep component props minimal and focused. Use prop drilling sparingly; co
 
 Composition: Favor component composition over inheritance.
 
-Next.js:
 
-Data Fetching: Utilize Next.js's data fetching methods (getServerSideProps, getStaticProps, getStaticPaths) appropriately based on the data requirements of each page.
 
 API Routes: Use API routes for serverless functions that handle backend logic or interact with external services.
 
 Image Optimization: Use the next/image component for optimized image loading and delivery.
 
-Routing: Leverage Next.js's file-based routing system effectively.
 
 State Management:
 
@@ -222,11 +219,9 @@ Conduct periodic security audits and penetration testing to identify and address
 
 12. Performance Optimization
 
-Code Splitting: Leverage Next.js's automatic code splitting to reduce the initial bundle size and improve page load times.
 
 Lazy Loading: Lazy load components, images, and other resources that are not immediately needed on the initial page load.
 
-Image Optimization: Use Next.js's Image component to optimize images for different screen sizes and formats. Consider using a CDN for image delivery.
 
 Memoization: Use React.memo, useMemo, and useCallback to memoize expensive computations and prevent unnecessary re-renders.
 
