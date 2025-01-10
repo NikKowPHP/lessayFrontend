@@ -13,7 +13,9 @@ export const ROUTES = {
     ROOT: '/onboarding',
     LANGUAGE: '/onboarding/language',
     ASSESSMENT: {
+
       INTRO: '/onboarding/assessment/intro',
+      
       QUESTION: '/onboarding/assessment/question',
       COMPLETE: '/onboarding/assessment/complete',
     },

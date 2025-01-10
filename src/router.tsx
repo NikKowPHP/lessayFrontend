@@ -7,6 +7,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import LandingPage from '@/pages/LandingPage'
 import AuthPage from '@/pages/auth/AuthPage'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
+import LanguageSelectionPage from '@/pages/onboarding/LanguageSelectionPage'
 import AssessmentIntroPage from '@/pages/onboarding/assessment/AssessmentIntroPage'
 import AssessmentQuestionPage from '@/pages/onboarding/assessment/AssessmentQuestionPage'
 import AssessmentCompletePage from '@/pages/onboarding/assessment/AssessmentCompletePage'
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.ONBOARDING.ASSESSMENT.INTRO,
             element: <AssessmentIntroPage />,
+          },
+          {
+            path: ROUTES.ONBOARDING.LANGUAGE,
+            element: <LanguageSelectionPage />,
           },
           {
             path: ROUTES.ONBOARDING.ASSESSMENT.QUESTION,
