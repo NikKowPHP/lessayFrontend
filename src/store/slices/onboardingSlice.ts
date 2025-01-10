@@ -99,6 +99,14 @@ export const checkOnboardingStatus = createAsyncThunk(
   }
 )
 
+// Add new thunk for preloading prompts
+export const preloadPrompts = createThunkWithError<Record<AssessmentType, boolean>, void>(
+  'onboarding/preloadPrompts',
+  async () => {
+    return await onboardingService.preloadPrompts()
+  }
+)
+
 const initialState: OnboardingState = {
   isComplete: false,
   currentStep: OnboardingStep.Language,
@@ -195,6 +203,10 @@ const onboardingSlice = createSlice({
       // Persist state on all successful actions
       .addCase(checkOnboardingStatus.fulfilled, (state, action) => {
         state.isComplete = action.payload
+      })
+      // Add preload prompts case
+      .addCase(preloadPrompts.fulfilled, (state, action) => {
+        state.promptLoadStatus = action.payload
       })
       .addMatcher(
         (action) => action.type.startsWith('onboarding/') && action.type.endsWith('/fulfilled'),

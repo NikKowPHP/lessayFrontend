@@ -1,13 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { ROUTES } from '@/lib/constants/routes'
 import { 
   selectCurrentStep,
   startAssessment,
-  setAssessmentType 
+  setAssessmentType,
+  preloadPrompts 
 } from '@/store/slices/onboardingSlice'
 import { AssessmentType, OnboardingStep } from '@/lib/types/onboardingTypes'
+import { useError } from '@/lib/providers/ErrorProvider'
 
 const assessmentAreas = [
   {
@@ -35,7 +37,22 @@ const assessmentAreas = [
 export default function AssessmentIntroPage() {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { setError } = useError()
   const currentStep = useAppSelector(selectCurrentStep)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Start preloading prompts when page loads
+  useEffect(() => {
+    const preload = async () => {
+      try {
+        await dispatch(preloadPrompts()).unwrap()
+      } catch (error) {
+        console.error('Failed to preload prompts:', error)
+        // Don't show error to user yet, as this is preloading
+      }
+    }
+    preload()
+  }, [dispatch])
 
   useEffect(() => {
     if (currentStep < OnboardingStep.AssessmentIntro) {
@@ -44,16 +61,24 @@ export default function AssessmentIntroPage() {
   }, [currentStep, navigate])
 
   const handleStartAssessment = async () => {
+    setIsLoading(true)
     try {
       const firstType = AssessmentType.Pronunciation
       await dispatch(setAssessmentType(firstType))
       await dispatch(startAssessment(firstType)).unwrap()
       navigate(ROUTES.ONBOARDING.ASSESSMENT.QUESTION)
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start assessment'
       console.error('Failed to start assessment:', error)
+      setError(errorMessage)
+    } finally {
+      setIsLoading(false)
     }
   }
 
+  // Update button to show loading state
+  const buttonText = isLoading ? 'Preparing Assessment...' : 'Begin Assessment'
+  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-3xl w-full space-y-8 bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
@@ -98,21 +123,22 @@ export default function AssessmentIntroPage() {
         <div className="flex justify-center pt-4">
           <button
             onClick={handleStartAssessment}
-            className="
+            disabled={isLoading}
+            className={`
               inline-flex items-center justify-center
               px-8 py-3 
               border border-transparent 
               text-base font-medium rounded-md 
               text-white bg-primary 
-              hover:bg-primary-dark 
+              ${isLoading ? 'opacity-75 cursor-not-allowed' : 'hover:bg-primary-dark'}
               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
               transition-colors duration-300
               shadow-sm
               w-full sm:w-auto
-            "
+            `}
           >
-            Begin Assessment
-            <span className="ml-2">→</span>
+            {buttonText}
+            {!isLoading && <span className="ml-2">→</span>}
           </button>
         </div>
       </div>

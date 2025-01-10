@@ -96,26 +96,21 @@ class OnboardingService {
     try {
       const initialSession: OnboardingSession = {
         assessmentId: null,
-        currentStep: OnboardingStep.AssessmentIntro,
+        currentStep: OnboardingStep.Assessment,
         assessmentType: firstType,
         assessmentProgress: 0,
         prompts: {},
         responses: {},
-        promptLoadStatus: {
-          pronunciation: false,
-          vocabulary: false,
-          grammar: false,
-          comprehension: false
-        }
+        promptLoadStatus: await this.getPromptLoadStatus()
       }
       
-      storageService.setOnboardingSession(initialSession)
+      await storageService.setOnboardingSession(initialSession)
       
-      // Get first prompt while initiating other fetches
-      const firstPrompt = await this.initializePromptQueue(firstType)
+      // Get first prompt from queue if available
+      const firstPrompt = await this.getPrompt(firstType)
       
       // Update session with first prompt
-      storageService.updateOnboardingSession({
+      await storageService.updateOnboardingSession({
         prompts: {
           [firstType]: firstPrompt
         }
@@ -286,6 +281,45 @@ class OnboardingService {
       default:
         return ROUTES.ONBOARDING.LANGUAGE
     }
+  }
+
+  // Add new method for preloading prompts
+  async preloadPrompts() {
+    try {
+      // Initialize the prompt queue for all assessment types
+      const allTypes = Object.values(AssessmentType)
+      
+      // Start fetching all prompts in parallel
+      allTypes.forEach(type => {
+        const promise = this.fetchPrompt(type)
+        this.promptQueue.set(type, promise)
+      })
+
+      // Return a loading status map
+      const loadingStatus = allTypes.reduce((acc, type) => ({
+        ...acc,
+        [type]: false
+      }), {} as Record<AssessmentType, boolean>)
+
+      // Update session with initial prompt load status
+      await storageService.updateOnboardingSession({
+        promptLoadStatus: loadingStatus
+      })
+
+      return loadingStatus
+    } catch (error) {
+      console.error('Failed to preload prompts:', error)
+      throw new Error('Failed to preload assessment prompts')
+    }
+  }
+
+  // Helper method to get current prompt load status
+  private async getPromptLoadStatus(): Promise<Record<AssessmentType, boolean>> {
+    const session = await storageService.getOnboardingSession()
+    return session?.promptLoadStatus || Object.values(AssessmentType).reduce((acc, type) => ({
+      ...acc,
+      [type]: false
+    }), {} as Record<AssessmentType, boolean>)
   }
 }
 
