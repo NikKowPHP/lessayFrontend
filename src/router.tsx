@@ -3,6 +3,7 @@ import { ROUTES } from '@/lib/constants/routes'
 import RootLayout from '@/components/layout/RootLayout'
 import AuthLayout from '@/components/layout/AuthLayout'
 import ProtectedLayout from '@/components/layout/ProtectedLayout'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import LandingPage from '@/pages/LandingPage'
 import AuthPage from '@/pages/auth/AuthPage'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
@@ -14,6 +15,7 @@ import LearningPathPage from '@/pages/learning/LearningPathPage'
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         path: ROUTES.LANDING.PATH,
@@ -21,6 +23,7 @@ export const router = createBrowserRouter([
       },
       {
         element: <AuthLayout />,
+        errorElement: <ErrorBoundary />,
         children: [
           {
             path: ROUTES.AUTH.ROOT,
@@ -30,6 +33,7 @@ export const router = createBrowserRouter([
       },
       {
         element: <ProtectedLayout />,
+        errorElement: <ErrorBoundary />,
         children: [
           {
             path: ROUTES.ONBOARDING.ROOT,
@@ -52,6 +56,10 @@ export const router = createBrowserRouter([
             element: <LearningPathPage />,
           },
         ],
+      },
+      {
+        path: '*',
+        element: <ErrorBoundary />,
       },
     ],
   },
