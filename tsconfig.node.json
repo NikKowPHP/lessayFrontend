@@ -1,38 +1,11 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES2022",
-    "lib": ["ES2023"],
-    "module": "ESNext",
+    "composite": true,
     "skipLibCheck": true,
-
-    /* Bundler mode */
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/services/*": ["./src/lib/services/*"],
-      "@/providers/*": ["./src/lib/providers/*"],
-      "@/store/*": ["./src/store/*"],
-      "@/types/*": ["./src/lib/types/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/constants/*": ["./src/lib/constants/*"],
-      "@/lib/api/*": ["./src/lib/api/*"],
-      "@/models/*": ["./src/lib/models/*"],
-      "@/hooks/*": ["./src/hooks/*"]
-    }
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"]
   },
   "include": ["vite.config.ts"]
 }
