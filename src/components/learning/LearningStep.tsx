@@ -1,44 +1,59 @@
-// import { Button } from '@/components/ui/Button'
-// import { useAppDispatch } from '@/store/hooks'
-// import { completeStep } from '@/store/slices/learningSlice'
-// import type { LearningStep as LearningStepType } from '@/lib/types/learning'
+import { Button } from '@/components/ui/Button'
+import type { LearningStep as LearningStepType } from '@/lib/models/responses/LearningResponses'
+import { StepStatus } from '@/lib/models/responses/LearningResponses'
 
-// interface LearningStepProps {
-//   step: LearningStepType
-//   isActive: boolean
-// }
+interface LearningStepProps {
+  step: LearningStepType
+  isActive: boolean
+}
 
-// export const LearningStep = ({ step, isActive }: LearningStepProps) => {
-//   const dispatch = useAppDispatch()
+export function LearningStep({ step, isActive }: LearningStepProps) {
+  const getStepStatusClass = (status: StepStatus) => {
+    switch (status) {
+      case StepStatus.Completed:
+        return 'bg-green-100 border-green-500'
+      case StepStatus.Current:
+        return 'bg-blue-100 border-blue-500'
+      case StepStatus.Locked:
+        return 'bg-gray-100 border-gray-300'
+      default:
+        return 'bg-white border-gray-200'
+    }
+  }
 
-//   const handleComplete = () => {
-//     dispatch(completeStep(step.id))
-//   }
-
-//   return (
-//     <div className={`p-4 border rounded-lg ${isActive ? 'border-blue-500' : 'border-gray-200'}`}>
-//       <div className="flex justify-between items-center">
-//         <div>
-//           <h3 className="font-semibold">{step.title}</h3>
-//           <p className="text-sm text-gray-600">{step.description}</p>
-//         </div>
-//         {isActive && (
-//           <Button 
-//             onClick={handleComplete}
-//             disabled={step.completed}
-//           >
-//             {step.completed ? 'Completed' : 'Complete Step'}
-//           </Button>
-//         )}
-//       </div>
-//       {step.progress > 0 && (
-//         <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
-//           <div 
-//             className="bg-blue-600 h-2.5 rounded-full" 
-//             style={{ width: `${step.progress}%` }}
-//           />
-//         </div>
-//       )}
-//     </div>
-//   )
-// }
+  return (
+    <div
+      className={`p-4 rounded-lg border-2 ${getStepStatusClass(step.status)} 
+        ${isActive ? 'ring-2 ring-blue-400' : ''}`}
+    >
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold">{step.title}</h3>
+          <p className="text-gray-600">{step.description}</p>
+          {step.progressIndicators && (
+            <div className="mt-2 text-sm text-gray-500">
+              {Object.entries(step.progressIndicators).map(([key, value]) => (
+                <div key={key}>
+                  {key}: {value.displayValue}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center space-x-2">
+          {step.status === StepStatus.Current && (
+            <Button variant="primary">
+              Start
+            </Button>
+          )}
+          {step.status === StepStatus.Completed && (
+            <span className="text-green-500">✓ Completed</span>
+          )}
+          {step.status === StepStatus.Locked && (
+            <span className="text-gray-400">🔒 Locked</span>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
