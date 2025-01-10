@@ -1,6 +1,6 @@
 import { AbstractStorage, IStorageAdapter } from './abstractStorage'
 import { LocalForageAdapter } from './localForageAdapter'
-import { AuthResponse } from '@/lib/types/auth.types'
+import { AuthResponse } from '@/lib/types/auth'
 
 const AUTH_KEY = 'auth_session'
 const SESSION_KEY = 'auth_session_cache'

@@ -21,7 +21,7 @@ class OnboardingService {
   private promptQueue: Map<AssessmentType, Promise<any>>
 
   constructor(api?: IOnboardingApi) {
-    this.api = api || (process.env.NODE_ENV === 'development' 
+    this.api = api || (import.meta.env.DEV 
       ? new MockOnboardingApi()
       : OnboardingApi.getInstance())
     this.promptQueue = new Map()

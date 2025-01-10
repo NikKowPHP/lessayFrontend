@@ -9,7 +9,7 @@ class AuthService {
   private api: IAuthApi
 
   constructor(api?: IAuthApi) {
-    this.api = api || (process.env.NODE_ENV === 'development' 
+    this.api = api || (import.meta.env.DEV 
       ? new MockAuthApi()
       : AuthApi.getInstance())
   }
@@ -18,7 +18,7 @@ class AuthService {
     Cookies.set(this.TOKEN_KEY, token, { 
       expires: 7, // 7 days
       sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production'
+      secure: import.meta.env.PROD
     })
   }
 
