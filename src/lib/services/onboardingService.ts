@@ -14,7 +14,7 @@ import { storageService } from './storageService'
 import { ComprehensionAssessmentRequest, GrammarAssessmentRequest, PronunciationAssessmentRequest, VocabularyAssessmentRequest } from '../models/requests/assessments/AssessmentRequests'
 import { AssessmentOrder, OnboardingSession, OnboardingStep } from '../types/onboardingTypes'
 import { AssessmentType } from '../types/onboardingTypes'
-
+import { ROUTES } from '@/lib/constants/routes'
 
 class OnboardingService {
   private api: IOnboardingApi
@@ -233,6 +233,58 @@ class OnboardingService {
       return response.data
     } catch (error) {
       throw new Error('Failed to submit comprehension assessment')
+    }
+  }
+
+  async isOnboardingComplete(): Promise<boolean> {
+    try {
+      const session = await storageService.getOnboardingSession()
+      
+      // Check if session exists and is complete
+      if (!session) return false
+      
+      return session.currentStep === OnboardingStep.Complete && 
+             session.finalAssessment !== null
+    } catch (error) {
+      console.error('Failed to check onboarding status:', error)
+      return false
+    }
+  }
+
+  async checkAndRedirectOnboarding(): Promise<void> {
+    const isComplete = await this.isOnboardingComplete()
+    
+    if (!isComplete) {
+      // Get current pathname
+      const currentPath = window.location.pathname
+      
+      // Check if already on onboarding route
+      const isOnboardingRoute = currentPath.startsWith(ROUTES.ONBOARDING.ROOT)
+      
+      if (!isOnboardingRoute) {
+        // Redirect to last known onboarding step or start
+        const session = await storageService.getOnboardingSession()
+        const redirectPath = session 
+          ? this.getOnboardingRedirectPath(session.currentStep)
+          : ROUTES.ONBOARDING.LANGUAGE
+        
+        window.location.href = redirectPath
+      }
+    }
+  }
+
+  private getOnboardingRedirectPath(step: OnboardingStep): string {
+    switch (step) {
+      case OnboardingStep.Language:
+        return ROUTES.ONBOARDING.LANGUAGE
+      case OnboardingStep.AssessmentIntro:
+        return ROUTES.ONBOARDING.ASSESSMENT.INTRO
+      case OnboardingStep.Assessment:
+        return ROUTES.ONBOARDING.ASSESSMENT.QUESTION
+      case OnboardingStep.Complete:
+        return ROUTES.ONBOARDING.ASSESSMENT.COMPLETE
+      default:
+        return ROUTES.ONBOARDING.LANGUAGE
     }
   }
 }

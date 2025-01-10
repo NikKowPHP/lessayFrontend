@@ -52,6 +52,7 @@ export interface AssessmentResponses {
 }
 
 export interface OnboardingState {
+  isComplete: boolean
   currentStep: OnboardingStep
   assessmentType: AssessmentType | null
   loading: boolean

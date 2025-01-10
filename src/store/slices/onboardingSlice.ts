@@ -67,7 +67,19 @@ export const rehydrateState = createAsyncThunk(
   }
 )
 
+export const checkOnboardingStatus = createAsyncThunk(
+  'onboarding/checkStatus',
+  async (_, { }) => {
+    const isComplete = await onboardingService.isOnboardingComplete()
+    if (!isComplete) {
+      await onboardingService.checkAndRedirectOnboarding()
+    }
+    return isComplete
+  }
+)
+
 const initialState: OnboardingState = {
+  isComplete: false,
   currentStep: OnboardingStep.Language,
   assessmentType: null,
   loading: false,
@@ -149,6 +161,9 @@ const onboardingSlice = createSlice({
         }
       })
       // Persist state on all successful actions
+      .addCase(checkOnboardingStatus.fulfilled, (state, action) => {
+        state.isComplete = action.payload
+      })
       .addMatcher(
         (action) => action.type.startsWith('onboarding/') && action.type.endsWith('/fulfilled'),
         (state) => {
@@ -166,6 +181,9 @@ export const selectAssessmentType = (state: RootState) => state.onboarding.asses
 export const selectAssessmentProgress = (state: RootState) => state.onboarding.assessmentProgress
 export const selectPrompts = (state: RootState) => state.onboarding.prompts
 export const selectResponses = (state: RootState) => state.onboarding.responses
+export const selectIsOnboardingComplete = (state: RootState) => 
+  state.onboarding.currentStep === OnboardingStep.Complete && 
+  state.onboarding.finalAssessment !== null
 
 export const { 
   setCurrentStep, 
