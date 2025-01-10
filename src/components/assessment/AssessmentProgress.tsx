@@ -1,10 +1,11 @@
-'use client'
+
+import { FC } from 'react'
 
 interface Props {
   progress: number
 }
 
-export default function AssessmentProgress({ progress }: Props) {
+const AssessmentProgress: FC<Props> = ({ progress }) => {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-2">
@@ -23,5 +24,7 @@ export default function AssessmentProgress({ progress }: Props) {
       </div>
     </div>
   )
-} 
+}
+
+export default AssessmentProgress 
 

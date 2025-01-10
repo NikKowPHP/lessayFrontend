@@ -22,7 +22,7 @@ const ProtectedLayout: FC = () => {
   if (!isAuthenticated) {
     return (
       <Navigate 
-        to={ROUTES.AUTH.LOGIN} 
+        to={ROUTES.AUTH.ROOT} 
         replace 
         state={{ from: location.pathname }}
       />

@@ -13,7 +13,7 @@ export class AuthApi extends Api implements IAuthApi {
   }
 
   private constructor() {
-    super(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api')
+    super(import.meta.env.VITE_API_URL || 'http://localhost:3000/api')
   }
 
   public static getInstance(): AuthApi {

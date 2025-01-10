@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 
 import { AuthCredentials, SocialProvider } from '@/types/auth'
 import { setUserData, clearUserData } from './userSlice'
-import { authService } from '@/services/authService'
+import { authService } from '@/lib/services/authService'
 
 interface AuthState {
   isAuthenticated: boolean

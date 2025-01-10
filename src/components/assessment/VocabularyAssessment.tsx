@@ -1,15 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { useRecording } from '@/hooks/useRecording'
-import type { AssessmentQuestion } from '@/store/slices/onboardingSlice'
+import { VocabularyPromptData } from '@/lib/models/responses/prompts/VocabularyPromptResponse'
+
+interface AssessmentQuestion extends VocabularyPromptData {
+  content: string // UI display text
+  imageUrl: string // renamed from image_url to match component usage
+  options?: string[] // for multiple choice mode
+}
 
 interface Props {
-  question: AssessmentQuestion & {
-    imageUrl: string
-    options?: string[]
-  }
+  question: AssessmentQuestion
   onSubmit: (answer: { audioBlob?: Blob; selectedOption?: string }) => void
 }
 
@@ -42,12 +44,10 @@ export default function VocabularyAssessment({ question, onSubmit }: Props) {
       </div>
 
       <div className="relative aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
-        <Image
+        <img
           src={question.imageUrl}
           alt="Vocabulary assessment image"
-          fill
           className="object-cover"
-          priority
         />
       </div>
 

@@ -1,47 +1,65 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+// import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+// import { learningService } from '@/lib/services/learningService'
+// import type { RootState } from '@/store'
+// import type { LearningPath, LearningState } from '@/lib/types/learning'
 
-interface LearningState {
-  currentStep: number
-  learningPath: any[] // Define proper type based on your needs
-  assessmentResults: any // Define proper type based on your needs
-  progress: {
-    pronunciation: number
-    grammar: number
-    vocabulary: number
-    comprehension: number
-  }
-}
+// export const fetchLearningPath = createAsyncThunk(
+//   'learning/fetchPath',
+//   async () => {
+//     return await learningService.getLearningPath()
+//   }
+// )
 
-const initialState: LearningState = {
-  currentStep: 0,
-  learningPath: [],
-  assessmentResults: null,
-  progress: {
-    pronunciation: 0,
-    grammar: 0,
-    vocabulary: 0,
-    comprehension: 0,
-  },
-}
+// export const completeStep = createAsyncThunk(
+//   'learning/completeStep',
+//   async (stepId: string) => {
+//     return await learningService.completeStep({ stepId })
+//   }
+// )
 
-const learningSlice = createSlice({
-  name: 'learning',
-  initialState,
-  reducers: {
-    setCurrentStep: (state, action: PayloadAction<number>) => {
-      state.currentStep = action.payload
-    },
-    setLearningPath: (state, action: PayloadAction<any[]>) => {
-      state.learningPath = action.payload
-    },
-    setAssessmentResults: (state, action: PayloadAction<any>) => {
-      state.assessmentResults = action.payload
-    },
-    updateProgress: (state, action: PayloadAction<Partial<LearningState['progress']>>) => {
-      state.progress = { ...state.progress, ...action.payload }
-    },
-  },
-})
+// const initialState: LearningState = {
+//   currentPath: null,
+//   loading: false,
+//   error: null
+// }
 
-export const { setCurrentStep, setLearningPath, setAssessmentResults, updateProgress } = learningSlice.actions
-export default learningSlice.reducer
+// const learningSlice = createSlice({
+//   name: 'learning',
+//   initialState,
+//   reducers: {
+//     resetLearning: () => initialState
+//   },
+//   extraReducers: (builder) => {
+//     builder
+//       .addCase(fetchLearningPath.pending, (state) => {
+//         state.loading = true
+//         state.error = null
+//       })
+//       .addCase(fetchLearningPath.fulfilled, (state, action) => {
+//         state.loading = false
+//         state.currentPath = action.payload
+//       })
+//       .addCase(fetchLearningPath.rejected, (state, action) => {
+//         state.loading = false
+//         state.error = action.error.message || 'Failed to fetch learning path'
+//       })
+//       .addCase(completeStep.fulfilled, (state, action) => {
+//         if (state.currentPath && action.payload.stepId) {
+//           const stepIndex = state.currentPath.steps.findIndex(
+//             step => step.id === action.payload.stepId
+//           )
+//           if (stepIndex !== -1) {
+//             state.currentPath.steps[stepIndex].completed = true
+//             state.currentPath.currentStepIndex = stepIndex + 1
+//           }
+//         }
+//       })
+//   }
+// })
+
+// export const selectLearningState = (state: RootState) => state.learning
+// export const selectCurrentPath = (state: RootState) => state.learning.currentPath
+
+// export const { resetLearning } = learningSlice.actions
+
+// export default learningSlice.reducer

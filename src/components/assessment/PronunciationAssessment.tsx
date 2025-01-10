@@ -1,8 +1,11 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { useRecording } from '@/hooks/useRecording'
-import type { AssessmentQuestion } from '@/store/slices/onboardingSlice'
+import { PronunciationPromptData } from '@/lib/models/responses/prompts/PronunciationPromptResponse'
+
+interface AssessmentQuestion extends PronunciationPromptData {
+  content: string
+  audioUrl?: string
+}
 
 interface Props {
   question: AssessmentQuestion
