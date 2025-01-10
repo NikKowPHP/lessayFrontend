@@ -9,13 +9,13 @@ import type {
   VocabularyAssessmentRequest,
   GrammarAssessmentRequest,
   ComprehensionAssessmentRequest
-} from '@/models/requests/assessments/AssessmentRequestIndex'
+} from '@/lib/models/requests/assessments/AssessmentRequests'
 import type {
   PronunciationResponse,
   VocabularyResponse,
   GrammarResponse,
   ComprehensionResponse
-} from '@/models/responses/assessments/AssessmentResponseIndex'
+} from '@/lib/models/responses/assessments/AssessmentResponseIndex'
 import type { FinalAssessmentResponse } from '@/lib/models/responses/assessments/FinalAssessmentResponse'
 import { LanguagePreferenceRequest, LanguagePreferencesResponse } from '@/lib/models/languages/LanguagePreferencesModel'
 

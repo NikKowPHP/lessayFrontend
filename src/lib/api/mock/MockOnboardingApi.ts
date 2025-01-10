@@ -27,6 +27,36 @@ interface MockRoute {
 export class MockOnboardingApi implements IOnboardingApi {
   private mockRoutes: MockRoute[] = [
     {
+      path: '/languages',
+      method: 'POST',
+      response: (data: LanguagePreferenceRequest) => ({
+        user_id: `user_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        native_language: data.nativeLanguage,
+        target_language: data.targetLanguage,
+        preferences_saved: true,
+        initial_proficiency_estimate: {
+          cefr_level: 'A1',
+          confidence: 0.95
+        },
+        recommended_starting_level: {
+          speaking: 'A1',
+          listening: 'A1',
+          pronunciation: 'A1'
+        },
+        learning_path: {
+          estimated_time_to_next_level: '3 months',
+          recommended_focus_areas: [
+            'basic_pronunciation',
+            'essential_vocabulary',
+            'fundamental_grammar'
+          ],
+          initial_assessment_required: true
+        },
+        status: 'success'
+      })
+    },
+    {
       path: '/pronunciation/prompt',
       method: 'GET',
       response: {
